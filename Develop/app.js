@@ -30,37 +30,34 @@ var start = function(){
                 message: "Please enter the Employee Name",
                 name:"name",
                 validate: function (input) {
-                    var done = this.async();
-                      if (input == null || input == undefined) {
-                        done('Please enter a valid value for name', false);
-                        return;
-                      }
-                      done(null, true);
-                  }
+                    if (input !== null || input !== undefined || input =="") {
+                        // SOLUTION: Simple place the return outside from the function
+                        return true;
+                    }
+                    return 'You need to type in a Name';
+                }
             },
             {
                 message: "Please enter the Employee Id",
                 name:"id",
                 validate: function (input) {
-                    var done = this.async();
-                      if (input == null || input == undefined) {
-                        done('Please enter a valid value for id', false);
-                        return;
-                      }
-                      done(null, true);
-                  }
+                    if (input !== null || input !== undefined || input =="") {
+                        // SOLUTION: Simple place the return outside from the function
+                        return true;
+                    }
+                    return 'You need to type in an Id';
+                }
             },
             {
                 message: "Please enter the Employee email",
                 name:"email",
                 validate: function (input) {
-                    var done = this.async();
-                      if (input.includes("@") == false) {
-                        done('Please enter a valid value for email', false);
-                        return;
-                      }
-                      done(null, true);
-                  }
+                    if (input.includes("@") == true && input.includes(".") == true) {
+                        // SOLUTION: Simple place the return outside from the function
+                        return true;
+                    }
+                    return 'You need to type in an Email';
+                }
             },
         ]).then(function(response){
             if(response.role === "Manager"){
@@ -73,13 +70,12 @@ var start = function(){
                         message:"Enter the Manager Office Number",
                         name:"officeNumber",
                         validate: function (input) {
-                            var done = this.async();
-                              if (input == null || input == undefined) {
-                                done('Please enter a valid value for Office Number', false);
-                                return;
-                              }
-                              done(null, true);
-                          }
+                            if (input !== null || input !== undefined || input =="") {
+                                // SOLUTION: Simple place the return outside from the function
+                                return true;
+                            }
+                            return 'You need to type in an Office Number';
+                        }
                         }
                     ).then(function(resp){
                         var manager = new Manager(response.name,response.id, response.email, resp.officeNumber)
@@ -87,15 +83,7 @@ var start = function(){
                         inquirer.prompt({
                             type: "confirm",
                             message: "Add another employee?",
-                            name:"again",
-                            validate: function (input) {
-                                var done = this.async();
-                                  if (typeof input !== 'boolean') {
-                                    done('Please answer y/N', false);
-                                    return;
-                                  }
-                                  done(null, true);
-                              }
+                            name:"again"
                         }).then(function(restart){
                             if(restart.again === true){
                                 start();
@@ -114,13 +102,12 @@ var start = function(){
                         message:"Enter the Engineer's Github username",
                         name:"github",
                         validate: function (input) {
-                            var done = this.async();
-                              if (input == null || input == undefined) {
-                                done('Please enter a valid value for github username', false);
-                                return;
-                              }
-                              done(null, true);
-                          }
+                            if (input !== null || input !== undefined || input =="") {
+                                // SOLUTION: Simple place the return outside from the function
+                                return true;
+                            }
+                            return 'You need to type in a github username';
+                        }
                         }
                     ).then(function(resp){
                         var engineer = new Engineer(response.name,response.id, response.email, resp.github)
@@ -128,15 +115,7 @@ var start = function(){
                         inquirer.prompt({
                             type: "confirm",
                             message: "Add another employee?",
-                            name:"again",
-                            validate: function (input) {
-                                var done = this.async();
-                                  if (typeof input !== 'boolean') {
-                                    done('Please answer y/N', false);
-                                    return;
-                                  }
-                                  done(null, true);
-                              }
+                            name:"again"
                         }).then(function(restart){
                             if(restart.again === true){
                                 start();
@@ -155,13 +134,12 @@ var start = function(){
                         message:"Enter the Intern's School",
                         name:"school",
                         validate: function (input) {
-                            var done = this.async();
-                              if (input == null || input == undefined) {
-                                done('Please enter a valid value for school', false);
-                                return;
-                              }
-                              done(null, true);
-                          }
+                            if (input !== null || input !== undefined || input =="") {
+                                // SOLUTION: Simple place the return outside from the function
+                                return true;
+                            }
+                            return 'You need to type in a proper school';
+                        }
                         }
                     ).then(function(resp){
                         var intern = new Intern(response.name,response.id, response.email, resp.school)
@@ -169,15 +147,7 @@ var start = function(){
                         inquirer.prompt({
                             type: "confirm",
                             message: "Add another employee?",
-                            name:"again",
-                            validate: function (input) {
-                                var done = this.async();
-                                  if (typeof input !== 'boolean') {
-                                    done('Please answer y/N', false);
-                                    return;
-                                  }
-                                  done(null, true);
-                              }
+                            name:"again"
                         }).then(function(restart){
                             if(restart.again === true){
                                 start();
