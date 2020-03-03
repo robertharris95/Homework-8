@@ -4,90 +4,194 @@ const Intern = require("./lib/Intern");
 const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
-​
 const OUTPUT_DIR = path.resolve(__dirname, "output")
 const outputPath = path.join(OUTPUT_DIR, "team.html");
-​
 const render = require("./lib/htmlRenderer");
-​
-​let employees = []
-// Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
-inquirer
-    .prompt([
-        {
-            type: "list",
-            message:"What is this employee's role?",
-            name:"role",
-            choices:[ "Manager", "Engineer", "Intern","Other"]
-        },
-        {
-            message: "Please enter the Employee Name",
-            name:"name"
-        },
-        {
-            message: "Please enter the Employee Id",
-            name:"id"
-        },
-        {
-            message: "Please enter the Employee email",
-            name:"email"
-        },
-    ]).then(function(response){
-        if(response.role === "Manager"){
-            
-            inquirer
-                .prompt(
-                    {
-                       message:"Enter the Manager Office Number",
-                       name:"officeNumber"
-                    }
-                ).then(function(response){
-                    console.log(this)
-                })
-        }
-        else if(response.role === "Engineer"){
-            
-            inquirer
-                .prompt(
-                    {
-                    message:"Enter the Engineer's Github username",
-                    name:"github"
-                    }
-                ).then(function(response){
-                    
-                })
-        }
-        else if(response.role === "Intern"){
-            
-            inquirer
-                .prompt(
-                    {
-                    message:"Enter the Intern's School",
-                    name:"school"
-                    }
-                ).then(function(response){
-                    
-                })
-        }
-
-    });
-// After the user has input all employees desired, call the `render` function (required
-// above) and pass in an array containing all employee objects; the `render` function will
-// generate and return a block of HTML including templated divs for each employee!
-​
-// After you have your html, you're now ready to create an HTML file using the HTML
-// returned from the `render` function. Now write it to a file named `team.html` in the
-// `output` folder. You can use the variable `outputPath` above target this location.
-// Hint: you may need to check if the `output` folder exists and create it if it
-// does not.
-​
-// HINT: each employee type (manager, engineer, or intern) has slightly different
-// information; write your code to ask different questions via inquirer depending on
-// employee type.
-​
-// HINT: make sure to build out your classes first! Remember that your Manager, Engineer,
-// and Intern classes should all extend from a class named Employee; see the directions
-// for further information. Be sure to test out each class and verify it generates an 
-// object with the correct structure and methods. This structure will be crucial in order
-// for the provided `render` function to work!```
+let employees = [];
+let choices = [];
+var hasManager = false
+var start = function(){
+    if(hasManager == false){
+    choices = [ "Manager", "Engineer", "Intern"]
+    }
+    else if(hasManager == true){
+        choices = [ "Engineer", "Intern"]
+    };
+    console.log("----------------------------------------------------------")
+    inquirer
+        .prompt([
+            {
+                type: "list",
+                message:"What is this employee's role?",
+                name:"role",
+                choices: choices
+            },
+            {
+                message: "Please enter the Employee Name",
+                name:"name",
+                validate: function (input) {
+                    var done = this.async();
+                      if (input == null || input == undefined) {
+                        done('Please enter a valid value for name', false);
+                        return;
+                      }
+                      done(null, true);
+                  }
+            },
+            {
+                message: "Please enter the Employee Id",
+                name:"id",
+                validate: function (input) {
+                    var done = this.async();
+                      if (input == null || input == undefined) {
+                        done('Please enter a valid value for id', false);
+                        return;
+                      }
+                      done(null, true);
+                  }
+            },
+            {
+                message: "Please enter the Employee email",
+                name:"email",
+                validate: function (input) {
+                    var done = this.async();
+                      if (input.includes("@") == false) {
+                        done('Please enter a valid value for email', false);
+                        return;
+                      }
+                      done(null, true);
+                  }
+            },
+        ]).then(function(response){
+            if(response.role === "Manager"){
+                //limits to 1 manager per team
+                hasManager = true
+                inquirer
+                    .prompt(
+                        {
+                        type: "number",
+                        message:"Enter the Manager Office Number",
+                        name:"officeNumber",
+                        validate: function (input) {
+                            var done = this.async();
+                              if (input == null || input == undefined) {
+                                done('Please enter a valid value for Office Number', false);
+                                return;
+                              }
+                              done(null, true);
+                          }
+                        }
+                    ).then(function(resp){
+                        var manager = new Manager(response.name,response.id, response.email, resp.officeNumber)
+                        employees.push(manager);
+                        inquirer.prompt({
+                            type: "confirm",
+                            message: "Add another employee?",
+                            name:"again",
+                            validate: function (input) {
+                                var done = this.async();
+                                  if (typeof input !== 'boolean') {
+                                    done('Please answer y/N', false);
+                                    return;
+                                  }
+                                  done(null, true);
+                              }
+                        }).then(function(restart){
+                            if(restart.again === true){
+                                start();
+                            }
+                            else{
+                                writer();
+                                return false;
+                            }
+                        })
+                    })
+            }
+            else if(response.role === "Engineer"){
+                inquirer
+                    .prompt(
+                        {
+                        message:"Enter the Engineer's Github username",
+                        name:"github",
+                        validate: function (input) {
+                            var done = this.async();
+                              if (input == null || input == undefined) {
+                                done('Please enter a valid value for github username', false);
+                                return;
+                              }
+                              done(null, true);
+                          }
+                        }
+                    ).then(function(resp){
+                        var engineer = new Engineer(response.name,response.id, response.email, resp.github)
+                        employees.push(engineer);
+                        inquirer.prompt({
+                            type: "confirm",
+                            message: "Add another employee?",
+                            name:"again",
+                            validate: function (input) {
+                                var done = this.async();
+                                  if (typeof input !== 'boolean') {
+                                    done('Please answer y/N', false);
+                                    return;
+                                  }
+                                  done(null, true);
+                              }
+                        }).then(function(restart){
+                            if(restart.again === true){
+                                start();
+                            }
+                            else{
+                                writer();
+                                return false;
+                            }
+                        })
+                    })
+            }
+            else if(response.role === "Intern"){
+                inquirer
+                    .prompt(
+                        {
+                        message:"Enter the Intern's School",
+                        name:"school",
+                        validate: function (input) {
+                            var done = this.async();
+                              if (input == null || input == undefined) {
+                                done('Please enter a valid value for school', false);
+                                return;
+                              }
+                              done(null, true);
+                          }
+                        }
+                    ).then(function(resp){
+                        var intern = new Intern(response.name,response.id, response.email, resp.school)
+                        employees.push(intern);
+                        inquirer.prompt({
+                            type: "confirm",
+                            message: "Add another employee?",
+                            name:"again",
+                            validate: function (input) {
+                                var done = this.async();
+                                  if (typeof input !== 'boolean') {
+                                    done('Please answer y/N', false);
+                                    return;
+                                  }
+                                  done(null, true);
+                              }
+                        }).then(function(restart){
+                            if(restart.again === true){
+                                start();
+                            }
+                            else{
+                                writer();
+                                return false;
+                            }
+                        })
+                    })
+            }
+        });
+    }
+var writer = function(){
+fs.writeFile(outputPath, render(employees), function(err){
+if (err) throw err;});}
+start();
